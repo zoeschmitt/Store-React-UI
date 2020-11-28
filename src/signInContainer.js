@@ -1,7 +1,9 @@
 import React from 'react';
 import axios from 'axios';
+import Home from './home';
 import './App.css';
 import logo from './logo.svg';
+
 
 export default class SignInContainer extends React.Component {
     constructor(props) {
@@ -16,15 +18,10 @@ export default class SignInContainer extends React.Component {
             userId: '',
             firstName: '',
             lastName: '',
-            search: '',
+            cartId: ''
         }
         this.signInEventHandler = this.signInEventHandler.bind(this);
-        this.emailInputeHandler = this.emailInputHandler.bind(this);
-        this.passInputeHandler = this.passInputHandler.bind(this);
-        this.firstNameInputHandler = this.firstNameInputHandler.bind(this);
-        this.lastNameInputHandler = this.lastNameInputHandler.bind(this);
-        this.searchInputeHandler = this.searchInputHandler.bind(this);
-        this.searchEventHandler = this.searchEventHandler.bind(this);
+        this.signUpEventHandler = this.signUpEventHandler.bind(this);
     }
 
     async signInEventHandler() {
@@ -34,15 +31,26 @@ export default class SignInContainer extends React.Component {
                 password: this.state.password
             }
             const res = await axios.post('http://localhost:8080/user/signin', signInBod);
-            if (res.status == 200) {
-                this.setState({ loggedIn: true, jwt: res.data.jwt, userId: res.data.userId, firstName: res.data.firstName, lastName: res.data.lastName });
+            console.log(`res: ${res.data.userId}`);
+            if (res.status === 200) {
+                this.setState({ loggedIn: true, jwt: res.data.jwt, userId: res.data.userId, firstName: res.data.firstName, lastName: res.data.lastName, cartId: res.data.carts[0] ? res.data.carts[0]._id : '' }, () => {
+                    console.log(`Signed in: ${res.data.jwt}`);
+                })
             } else {
-                this.setState({ error: "Error Logging In" });
+                if (res.status === 403) {
+                    this.setState({ error: "Wrong Credentials" }, () => {
+                        console.log("err wrong credentials");
+                    })
+                } else {
+                    this.setState({ error: "Error Logging In" }, () => {
+                        console.log("Error Logging In");
+                    })
+                }
             }
-
-            console.log(res);
         } catch (e) {
-            console.log(`error: ${e}`);
+            this.setState({ error: `error: ${e}` }, () => {
+                console.log(`error: ${e}`);
+            })
         }
     }
 
@@ -55,172 +63,82 @@ export default class SignInContainer extends React.Component {
                 password: this.state.password
             }
             const res = await axios.post('http://localhost:8080/user', signUpBod);
-            if (res.status == 200) {
-                this.setState({ registering: false, loggedIn: true, jwt: res.data.jwt, userId: res.data.userId, firstName: res.data.firstName, lastName: res.data.lastName });
+            if (res.status === 200) {
+                this.setState({ loggedIn: true, registering: false, jwt: res.data.jwt, userId: res.data.userId, firstName: res.data.firstName, lastName: res.data.lastName, cartId: res.data.carts[0] ? res.data.carts[0] : '' }, () => {
+                    console.log(`Registered: ${res.data.jwt}`);
+                })
             } else {
-                this.setState({ error: "Error Signing Up" });
+                this.setState({ error: "Error Signing Up" }, () => {
+                    console.log(`error`);
+                })
             }
 
-            console.log(res);
+            console.log(`${res.data.jwt}`);
         } catch (e) {
             console.log(`error: ${e}`);
         }
     }
-
-    emailInputHandler(event) {
-        this.setState({ email: event.target.value });
-    }
-
-    passInputHandler(event) {
-        this.setState({ password: event.target.value });
-    }
-
-    searchInputHandler(event) {
-        this.setState({ search: event.target.value });
-    }
-
-    firstNameInputHandler(event) {
-        this.setState({ firstName: event.target.value });
-    }
-
-    lastNameInputHandler(event) {
-        this.setState({ lastName: event.target.value });
-    }
-
-    showWelcomeMessage() {
-        if (this.state.firstName > 0 && this.state.lastName > 0) {
-            return <h2>Welcome, {this.state.firstName + ' ' + this.state.lastName + '!'}</h2>
-        } else {
-            return null;
-        }
-    }
-
-    showCart() {
-        try {
-            const res = await axios.get('http://localhost:8080/user/' + this.userId + '/cart');
-            if (!res.data.cartItems.length) {
-                const listArray = res.data.cartItems.forEach(item => {
-                    return <li>{item.name}</li>
-                });
-                return listArray;
-            } else {
-                return <h2>No Items in Cart</h2>
-            }
-        } catch (e) {
-            console.log(`error: ${e}`);
-            return null;
-        }
-    }
-
-    showItems() {
-        try {
-            const res = await axios.get('http://localhost:8080/storeItem/', { params: { query: this.state.search } });
-            if (!res.data.length) {
-                const listArray = res.data.forEach(item => {
-                    return <li>{item.name}</li>
-                });
-                return listArray;
-            } else {
-                return <h2>No Items</h2>
-            }
-        } catch (e) {
-            console.log(`error: ${e}`);
-            return null;
-        }
-    }
-
-    showRecentItems() {
-        try {
-            const res = await axios.get('http://localhost:8080/storeItem/Recent', { params: { num: 10 } });
-            if (!res.data.length) {
-                const listArray = res.data.forEach(item => {
-                    return <li>{item.name}</li>
-                });
-                return listArray;
-            } else {
-                return <h2>No Items</h2>
-            }
-        } catch (e) {
-            console.log(`error: ${e}`);
-            return null;
-        }
-    }
-
-    // searchEventHandler(event) {
-
-    // }
 
     render() {
-        if (!this.loggedIn) {
+        if (!this.state.loggedIn && !this.state.registering) {
             return (
-                <div>
+                <div className="container">
                     <div className="header">
                         <img src={logo} className="App-logo" alt="logo" />
-                        <h3>Zoe's React App!</h3>
+                        <div className="text-padding">
+                            <h3>Zoe's React App!</h3>
+                        </div>
                     </div>
-                    <div className="container mrgnbtm">
-                        <div className="col-md-8">
-                            <form>
-                                <div className="row">
-                                    <input placeholder='email' onBlur={this.signInEventHandler}></input>
-                                    <input type='password' placeholder='password' onBlur={this.passInputHandler}></input>
-                                </div>
-                                <div className="row">
-                                    <button onClick={this.signInEventHandler}>Sign In</button>
-                                    <button onClick={this.setState({ registering: true })}> or Sign Up</button>
-                                </div>
-                            </form>
+                    <div className="col-md-7 mrgnbtm">
+                        <p>{this.state.error}</p>
+                        <form>
+                            <input className="form-control" placeholder='email' onBlur={(e) => this.setState({ email: e.target.value })}></input>
+                            <input type='password' placeholder='password' autoComplete="on" onBlur={(e) => this.setState({ password: e.target.value })}></input>
+                        </form>
+                        <div className="row">
+                            <button onClick={this.signInEventHandler}>Sign In</button>
+                            <button onClick={() => this.setState({ registering: true }, () => {
+                                console.log("Person Registering");
+                            })}> or Sign Up</button>
                         </div>
                     </div>
                 </div>
             )
-        } else if (this.registering) {
-            <div>
-                <div className="header">
-                    <img src={logo} className="App-logo" alt="logo" />
-                    <h3>Zoe's React App!</h3>
-                </div>
-                <div className="container mrgnbtm">
-                    <div className="col-md-8">
-                        <form>
-                            <div className="row">
-                                <input placeholder='first name' onBlur={this.firstNameInputHandler}></input>
-                                <input placeholder='last name' onBlur={this.lastNameInputHandler}></input>
-                            </div>
-                            <div className="row">
-                                <input placeholder='email' onBlur={this.signInEventHandler}></input>
-                                <input type='password' placeholder='password' onBlur={this.passInputHandler}></input>
-                            </div>
-                            <div className="row">
-                                <button onClick={this.setState({ registering: false })}>or Sign In</button>
-                                <button onClick={this.signUpEventHandler}>Sign Up</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        } else {
-            //logo
-            //logout
+        } else if (this.state.registering && !this.state.loggedIn) {
             return (
                 <div>
                     <div className="header">
                         <img src={logo} className="App-logo" alt="logo" />
-                        {this.showWelcomeMessage()}
-                        <h3>Zoe's React App!</h3>
+                        <div className="text-padding">
+                            <h3>Zoe's React App!</h3>
+                        </div>
                     </div>
                     <div className="container mrgnbtm">
-                        <div className="flex-row">
-                            <ul>{this.showRecentItems()}</ul>
-                            <div className="col-md-8">
-                                <input placeholder='search for items' onChange={this.searchEventHandler}></input>
-                                <button onClick={this.searchEventHandler}>Search</button>
-                                <ul>{this.showItems()}</ul>
+                        <div className="col-md-8">
+                            <p>{this.state.error}</p>
+                            <form>
+                                <div className="row">
+                                    <input placeholder='first name' onBlur={(e) => this.setState({ firstName: e.target.value })}></input>
+                                    <input placeholder='last name' onBlur={(e) => this.setState({ lastName: e.target.value })}></input>
+                                </div>
+                                <div className="row">
+                                    <input placeholder='email' onBlur={(e) => this.setState({ email: e.target.value })}></input>
+                                    <input type='password' placeholder='password' autoComplete="on" onBlur={(e) => this.setState({ password: e.target.value })}></input>
+                                </div>
+                            </form>
+                            <div className="row">
+                                <button onClick={() => this.setState({ registering: false }, () => {
+                                    console.log("Person Signing in");
+                                })}>or Sign In</button>
+                                <button onClick={this.signUpEventHandler}>Sign Up</button>
                             </div>
-                            <ul>{this.showCart()}</ul> 
                         </div>
                     </div>
                 </div>
+            )
+        } else {
+            return (
+                <Home jwt={this.state.jwt} userId={this.state.userId} firstName={this.state.firstName} lastName={this.state.lastName} cartId={this.state.cartId} />
             )
         }
     }
