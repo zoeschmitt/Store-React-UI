@@ -1,10 +1,9 @@
-import React from 'react';
+import React from 'react'
+import { HeroContainer, HeroBg, HeroContent, HeroH1, HeroP, HeroBtnWrapper, ArrowForward, ArrowRight } from './HeroElements';
+import { Button } from '../ButtonElements'
 import axios from 'axios';
-import './App.css';
-import logo from './logo.svg';
-import { Scrollbars } from 'react-custom-scrollbars';
 
-export default class Home extends React.Component {
+export default class HeroSection extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -12,6 +11,7 @@ export default class Home extends React.Component {
             recentItems: [],
             items: [],
             cartItems: [],
+            hover: false,
         }
         this.showCart = this.showCart.bind(this);
         this.showItems = this.showItems.bind(this);
@@ -19,16 +19,19 @@ export default class Home extends React.Component {
         this.addToCart = this.addToCart.bind(this);
         this.removeFromCart = this.removeFromCart.bind(this);
         this.viewItem = this.viewItem.bind(this);
+        this.onHover = this.onHover.bind(this);
         console.log(`userId; ${this.props.userId}`);
         console.log(`jwt; ${this.props.jwt}`);
-        console.log(`first; ${this.props.firstName}`);
-        console.log(`lasst; ${this.props.lastName}`);
     }
 
     async componentDidMount() {
         await this.showRecentItems();
         await this.showItems();
         await this.showCart();
+    }
+
+    onHover() {
+        this.setState({ hover: !this.state.hover });
     }
 
     async showCart() {
@@ -76,7 +79,7 @@ export default class Home extends React.Component {
             });
             console.log(`res rec; ${res.data}`);
             if (res.status === 200 && res.data.length > 0) {
-                this.setState({recentItems: res.data }, () => {
+                this.setState({ recentItems: res.data }, () => {
                     console.log(`udpating recent items`);
                 })
             }
@@ -91,10 +94,12 @@ export default class Home extends React.Component {
             const res = await axios.post(`http://localhost:8080/user/${this.props.cartId}/cartItem`, {
                 "storeItemId": id,
                 "quantity": 1
-            }, { headers: {
+            }, {
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${this.props.jwt}`
-                },});
+                },
+            });
             console.log(`res add; ${res.data}`);
             if (res.status === 200 && res.data.cartItems.length > 0) {
                 this.setState({ cartItems: res.data.cartItems }, () => {
@@ -147,54 +152,26 @@ export default class Home extends React.Component {
             console.log(`error: ${e}`);
         }
     }
-
+    
     render() {
         return (
-            <div>
-                <div className="header">
-                    <img src={logo} className="App-logo" alt="logo" />
-                    {(this.props.firstName.length > 0 && this.props.lastName.length > 0) ? <h2>Welcome, {this.props.firstName + ' ' + this.props.lastName + '!'}</h2> : <h2>Welcome!</h2>}
-                    <div className="text-padding">
-                        <h3>Zoe's React App!</h3>
-                    </div>
-                </div>
-                <div className="flex-row">
-                    <div>
-                        <Scrollbars style={{ width: 300, height: 300 }}>
-                            {this.state.recentItems.length > 0 ? this.state.recentItems.map((category, key) => (
-                                <ul key={key}>{category.name}</ul>
-                            )) : <p>No Recently Viewed Items</p>}
-                        </Scrollbars>
-                    </div>
-                    <div className="col-md-8">
-                        <input placeholder='search for items' onChange={(e) => this.setState({ search: e.target.value }, () => {
-                            console.log(`search`);
-                        })}></input>
-                        <button onClick={this.showItems}>Search</button>
-                        <div>
-                            <Scrollbars style={{ width: 300, height: 300 }}>
-                                {this.state.items.length > 0 ? (this.state.items.map((category, key) => (
-                                    <div key={key} className="btn-row">
-                                        <ul>{category.name}</ul>
-                                        <button onClick={() => this.viewItem(category._id)}>view</button>
-                                        <button onClick={() => this.addToCart(category._id)}>+</button>
-                                    </div>
-                                ))) : (<p>No Items</p>)}
-                            </Scrollbars>
-                        </div>
-                    </div>
-                    <div>
-                        <Scrollbars style={{ width: 300, height: 300 }}>
-                            {this.state.cartItems.length > 0 ? this.state.cartItems.map((category, key) => (
-                                <div key={key} className="btn-row">
-                                    <ul>{category.item.name}</ul>
-                                    <button onClick={() => this.removeFromCart(category._id)}>x</button>
-                                </div>
-                            )) : <p>No Items in Cart</p>}
-                        </Scrollbars>
-                    </div>
-                </div>
-            </div>
+            <HeroContainer id="home">
+                <HeroBg>
+                    
+                </HeroBg>
+                <HeroContent>
+                    <HeroH1>Zoe Schmitt</HeroH1>
+                    <HeroP>Software Engineer
+                </HeroP>
+                    <HeroBtnWrapper>
+                        <Button to='aboutme' smooth={true} duration={500} spy={true} exact='true' onMouseEnter={this.onHover} onMouseLeave={this.onHover
+                        } primary="true" dark="true"
+                        >About Me {this.state.hover ? <ArrowForward style={{ transform: `rotate(90deg)` }} /> : <ArrowRight style={{ transform: `rotate(90deg)` }} />}</Button>
+                    </HeroBtnWrapper>
+                </HeroContent>
+            </HeroContainer>
         )
     }
 }
+
+

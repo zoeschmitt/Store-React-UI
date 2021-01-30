@@ -1,24 +1,17 @@
 import React from 'react';
 import axios from 'axios';
-import Home from './home';
-import './App.css';
-import logo from './logo.svg';
 
 
-export default class SignInContainer extends React.Component {
+export default class AuthPage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            loggedIn: false,
             registering: false,
             error: '',
             email: '',
             password: '',
-            jwt: '',
-            userId: '',
             firstName: '',
             lastName: '',
-            cartId: ''
         }
         this.signInEventHandler = this.signInEventHandler.bind(this);
         this.signUpEventHandler = this.signUpEventHandler.bind(this);
@@ -33,9 +26,10 @@ export default class SignInContainer extends React.Component {
             const res = await axios.post('http://localhost:8080/user/signin', signInBod);
             console.log(`res: ${res.data.userId}`);
             if (res.status === 200) {
-                this.setState({ loggedIn: true, jwt: res.data.jwt, userId: res.data.userId, firstName: res.data.firstName, lastName: res.data.lastName, cartId: res.data.carts[0] ? res.data.carts[0]._id : '' }, () => {
-                    console.log(`Signed in: ${res.data.jwt}`);
-                })
+                this.props.toggleLoggedIn();
+                this.props.setNewJWT(res.data.jwt);
+                this.props.setNewUserId(res.data.userId);
+                this.props.setNewCartId(res.data.carts[0] ? res.data.carts[0]._id : '');
             } else {
                 if (res.status === 403) {
                     this.setState({ error: "Wrong Credentials" }, () => {
@@ -64,9 +58,10 @@ export default class SignInContainer extends React.Component {
             }
             const res = await axios.post('http://localhost:8080/user', signUpBod);
             if (res.status === 200) {
-                this.setState({ loggedIn: true, registering: false, jwt: res.data.jwt, userId: res.data.userId, firstName: res.data.firstName, lastName: res.data.lastName, cartId: res.data.carts[0] ? res.data.carts[0] : '' }, () => {
-                    console.log(`Registered: ${res.data.jwt}`);
-                })
+                this.props.toggleLoggedIn();
+                this.props.setNewJWT(res.data.jwt);
+                this.props.setNewUserId(res.data.userId);
+                this.props.setNewCartId(res.data.carts[0] ? res.data.carts[0]._id : '');
             } else {
                 this.setState({ error: "Error Signing Up" }, () => {
                     console.log(`error`);
@@ -80,15 +75,9 @@ export default class SignInContainer extends React.Component {
     }
 
     render() {
-        if (!this.state.loggedIn && !this.state.registering) {
+        if (!this.state.registering) {
             return (
-                <div className="container">
-                    <div className="header">
-                        <img src={logo} className="App-logo" alt="logo" />
-                        <div className="text-padding">
-                            <h3>Zoe's React App!</h3>
-                        </div>
-                    </div>
+                <div>
                     <div className="col-md-7 mrgnbtm">
                         <p>{this.state.error}</p>
                         <form>
@@ -104,15 +93,9 @@ export default class SignInContainer extends React.Component {
                     </div>
                 </div>
             )
-        } else if (this.state.registering && !this.state.loggedIn) {
+        } else {
             return (
                 <div>
-                    <div className="header">
-                        <img src={logo} className="App-logo" alt="logo" />
-                        <div className="text-padding">
-                            <h3>Zoe's React App!</h3>
-                        </div>
-                    </div>
                     <div className="container mrgnbtm">
                         <div className="col-md-8">
                             <p>{this.state.error}</p>
@@ -135,10 +118,6 @@ export default class SignInContainer extends React.Component {
                         </div>
                     </div>
                 </div>
-            )
-        } else {
-            return (
-                <Home jwt={this.state.jwt} userId={this.state.userId} firstName={this.state.firstName} lastName={this.state.lastName} cartId={this.state.cartId} />
             )
         }
     }
