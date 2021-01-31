@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-
+import { AuthContainer, AuthBg, AuthContent, VideoBg } from './AuthPageElements';
 
 export default class AuthPage extends React.Component {
     constructor(props) {
@@ -26,7 +26,7 @@ export default class AuthPage extends React.Component {
             const res = await axios.post('http://localhost:8080/user/signin', signInBod);
             console.log(`res: ${res.data.userId}`);
             if (res.status === 200) {
-                this.props.toggleLoggedIn();
+                this.props.toggleLoggedIn(true);
                 this.props.setNewJWT(res.data.jwt);
                 this.props.setNewUserId(res.data.userId);
                 this.props.setNewCartId(res.data.carts[0] ? res.data.carts[0]._id : '');
@@ -58,7 +58,7 @@ export default class AuthPage extends React.Component {
             }
             const res = await axios.post('http://localhost:8080/user', signUpBod);
             if (res.status === 200) {
-                this.props.toggleLoggedIn();
+                this.props.toggleLoggedIn(true);
                 this.props.setNewJWT(res.data.jwt);
                 this.props.setNewUserId(res.data.userId);
                 this.props.setNewCartId(res.data.carts[0] ? res.data.carts[0]._id : '');
@@ -77,8 +77,11 @@ export default class AuthPage extends React.Component {
     render() {
         if (!this.state.registering) {
             return (
-                <div>
-                    <div className="col-md-7 mrgnbtm">
+                <AuthContainer>
+                    <AuthBg>
+                        <VideoBg autoPlay loop muted src='../../videos/airplane.mp4' type='video/m4' />
+                    </AuthBg>
+                    <AuthContent>
                         <p>{this.state.error}</p>
                         <form>
                             <input className="form-control" placeholder='email' onBlur={(e) => this.setState({ email: e.target.value })}></input>
@@ -90,14 +93,16 @@ export default class AuthPage extends React.Component {
                                 console.log("Person Registering");
                             })}> or Sign Up</button>
                         </div>
-                    </div>
-                </div>
+                    </AuthContent>
+                </AuthContainer>
             )
         } else {
             return (
-                <div>
-                    <div className="container mrgnbtm">
-                        <div className="col-md-8">
+                <AuthContainer>
+                    <AuthBg>
+                        <VideoBg autoPlay loop muted src='../../videos/airplane.mp4' type='video/m4' />
+                    </AuthBg>
+                    <AuthContent>
                             <p>{this.state.error}</p>
                             <form>
                                 <div className="row">
@@ -115,9 +120,8 @@ export default class AuthPage extends React.Component {
                                 })}>or Sign In</button>
                                 <button onClick={this.signUpEventHandler}>Sign Up</button>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        </AuthContent>
+                </AuthContainer>
             )
         }
     }

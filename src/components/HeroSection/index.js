@@ -1,9 +1,11 @@
 import React from 'react'
-import { HeroContainer, HeroBg, HeroContent, HeroH1, HeroP, HeroBtnWrapper, ArrowForward, ArrowRight } from './HeroElements';
+import { HeroContainer, HeroBg, HeroContent, VideoBg, SearchWrapper, SearchIcon, SearchInput, HeroBtnWrapper, ArrowForward, ArrowRight } from './HeroElements';
 import { Button } from '../ButtonElements'
 import axios from 'axios';
+//import Video from '../../videos/airplane.mp4';
 
 export default class HeroSection extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
@@ -152,21 +154,21 @@ export default class HeroSection extends React.Component {
             console.log(`error: ${e}`);
         }
     }
-    
+
     render() {
         return (
-            <HeroContainer id="home">
+            <HeroContainer>
                 <HeroBg>
-                    
+                    <VideoBg autoPlay loop muted src='../../videos/hotair.mp4' type='video/m4' />
                 </HeroBg>
                 <HeroContent>
-                    <HeroH1>Zoe Schmitt</HeroH1>
-                    <HeroP>Software Engineer
-                </HeroP>
+                    <SearchWrapper>
+                        <SearchInput placeholder="Search" type="text" />
+                    </SearchWrapper>
                     <HeroBtnWrapper>
-                        <Button to='aboutme' smooth={true} duration={500} spy={true} exact='true' onMouseEnter={this.onHover} onMouseLeave={this.onHover
-                        } primary="true" dark="true"
-                        >About Me {this.state.hover ? <ArrowForward style={{ transform: `rotate(90deg)` }} /> : <ArrowRight style={{ transform: `rotate(90deg)` }} />}</Button>
+                        <Button smooth={true} duration={500} spy={true} exact='true' onMouseEnter={this.onHover} onMouseLeave={this.onHover
+                        } primary="false" dark="false"
+                        ><img src='../../icons/airplane.svg' alt='airplane icon' width='35px'/></Button>
                     </HeroBtnWrapper>
                 </HeroContent>
             </HeroContainer>

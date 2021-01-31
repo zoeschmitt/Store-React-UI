@@ -1,7 +1,6 @@
 import React, {useState} from 'react'
 import NavBar from '../components/NavBar'
 import SideBar from '../components/SideBar'
-import Footer from '../components/Footer'
 import HeroSection from '../components/HeroSection'
 import AuthPage from '../components/AuthPage'
 
@@ -32,7 +31,6 @@ const Home = () => {
                 <SideBar isOpen={isOpen} toggle={toggleSideBar} isLoggedIn={isLoggedIn}/>
                 <NavBar toggle={toggleSideBar} isLoggedIn={isLoggedIn}/>
                 <HeroSection jwt={jwt} userId={userId} cartId={cartId}/>
-                <Footer />
             </>
         )
     } else {
@@ -41,7 +39,6 @@ const Home = () => {
                 <SideBar isOpen={isOpen} toggle={toggleSideBar} isLoggedIn={isLoggedIn}/>
                 <NavBar toggle={toggleSideBar} isLoggedIn={isLoggedIn}/>
                 <AuthPage toggleLoggedIn={toggleLoggedIn} setNewJWT={setNewJWT} setNewUserId={setNewUserId} setNewCartId={setNewCartId}/>
-                <Footer />
             </>
         )
     }

@@ -35,51 +35,60 @@ export const HeroBg = styled.div`
     overflow: hidden;
 `;
 
+export const VideoBg = styled.video`
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    //background: #232a34;
+`;
+
 export const HeroContent = styled.div`
     z-index: 3;
     max-width: 1200px;
     position: absolute;
     padding: 8px 24px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
 `;
 
-export const HeroH1 = styled.div`
-    color: #1b1b1b;
-    font-size: 48px;
-    text-align: center;
-    font-weight: 500;
+export const SearchWrapper = styled.div`
+    display: flex;
+    min-width: 210px;
+    width: 360px;
+    color: blue;
+`;
 
-    @media screen and (max-width: 768px) {
-        font-size: 40px;
-    }
+export const SearchIcon = styled.div`
+    width: 100%;
+    height: 100%;
+`;
 
-    @media screen and (max-width: 480px) {
-        font-size: 32px;
+export const SearchInput = styled.input`
+    border: none;
+    border-radius: 10px;
+    width: 99%;
+    padding: ${({big}) => (big ? '14px 48px' : '12px 30px')};
+    background-color: rgba(255,255,255, 0.6);;
+
+    &:hover, &:focus {
+        outline: none;
+        border: none;
+        border-radius: 13px;
+        background-color: white;
     }
 `;
 
-export const HeroP = styled.div`
-    margin-top: 24px;
-    color: #1b1b1b;
-    font-size: 24px;
-    text-align: center;
-    max-width: 600px;
-
-    @media screen and (max-width: 768px) {
-        font-size: 24px;
-    }
-
-    @media screen and (max-width: 480px) {
-        font-size: 18px;
-    }
+export const ClearIcon = styled.image`
+    position: absolute;
+    cursor: pointer;
+    visibility: hidden;
 `;
 
 export const HeroBtnWrapper = styled.div`
-    margin-top: 32px;
+    //margin-top: 32px;
     display: flex;
-    flex-direction:column;
+    //flex-direction:column;
     align-items: center;
 `;
 
